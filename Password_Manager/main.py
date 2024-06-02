@@ -30,62 +30,68 @@ def generate_password():
 # ---------------------------- SAVE PASSWORD ------------------------------- #
 def save():
     def key_store():
-        #------------------------------cryptography key-------------------------------------------
-        key = (Fernet.generate_key()).decode('utf-8')#creates cryptography key       
+        # Generate a cryptography key
+        key = (Fernet.generate_key()).decode('utf-8')       
         cipher = Fernet(key)
-        #------------------------------------json------------------------------------------
+        
+        # Get the website, email, and password entries
         website = hash_maker(website_entry.get().lower())
         email = email_entry.get()
         password = password_entry.get()
         new_data = {
             website: {
-                "key" : key #saves hashed website and fernet key in json file
+                "key": key  # Save hashed website and Fernet key in json file
             }
         }
 
         if len(website) == 0 or len(password) == 0:
             messagebox.showinfo(title="Oops", message="Please make sure you haven't left any fields empty.")
         else:
+            # Load existing data from JSON file or create new one if not found
             try:
                 with open("data.json", "r") as data_file:
-                    #Reading old data
                     data = json.load(data_file)
             except FileNotFoundError:
                 with open("data.json", "w") as data_file:
                     json.dump(new_data, data_file, indent=4)
             else:
-                #Updating old data with new data
+                # Update old data with new data
                 data.update(new_data)
 
                 with open("data.json", "w") as data_file:
-                    #Saving updated data
                     json.dump(data, data_file, indent=4)
             finally:
                 website_entry.delete(0, END)
                 password_entry.delete(0, END)
                 email_entry.delete(0, END)
 
-#----------------------database--------------------------  
+            # Connect to the SQLite database
+            conn = sqlite3.connect('main.db')
+            c = conn.cursor()
+            c.execute('''CREATE TABLE IF NOT EXISTS passwords
+                         (website VARCHAR (255), username VARCHAR (255), password VARCHAR (255))''')
+            conn.commit()
 
-        conn = sqlite3.connect('main.db')
-        c = conn.cursor()
-        c.execute('''CREATE TABLE IF NOT EXISTS passwords
-                 (website VARCHAR (255), username VARCHAR (255), password VARCHAR (255))''')
-        conn.commit()
+            # Encrypt the email and password
+            encrypted_password = cipher.encrypt(password.encode('utf-8')).decode('utf-8')
+            encrypted_email = cipher.encrypt(email.encode('utf-8')).decode('utf-8')
 
-        encrypted_password = cipher.encrypt(password.encode('utf-8'))
-        crypt_pass = encrypted_password.decode('utf-8')
+            # Check if the website already exists in the database
+            c.execute("SELECT * FROM passwords WHERE website=?", (website,))
+            result = c.fetchone()
 
-        encrypted_email = cipher.encrypt(email.encode('utf-8'))
-        crypt_email = encrypted_email.decode('utf-8')
+            if result:
+                # Update the existing record
+                c.execute("UPDATE passwords SET username=?, password=? WHERE website=?", (encrypted_email, encrypted_password, website))
+            else:
+                # Insert a new record
+                c.execute("INSERT INTO passwords VALUES (?, ?, ?)", (website, encrypted_email, encrypted_password))
 
-        c.execute("INSERT INTO passwords VALUES (?, ?, ?)", (website, crypt_email, crypt_pass))
-        conn.commit()# database to store the values encrypted 
-        conn.close()
-
-
+            conn.commit()
+            conn.close()
 
     key_store()
+
 # ---------------------------- FIND PASSWORD ------------------------------- #
 def find_password():
     website = website_entry.get()
