@@ -1,4 +1,5 @@
-from customtkinter import *
+import customtkinter
+from tkinter import *
 from tkinter import messagebox
 from random import choice, randint, shuffle
 import pyperclip
@@ -35,7 +36,7 @@ def save():
         cipher = Fernet(key)
         
         # Get the website, email, and password entries
-        website = hash_maker(website_entry.get().lower())
+        website = hash_maker(website_entry_tab1.get().lower())
         email = email_entry.get()
         password = password_entry.get()
         new_data = {
@@ -61,7 +62,7 @@ def save():
                 with open("data.json", "w") as data_file:
                     json.dump(data, data_file, indent=4)
             finally:
-                website_entry.delete(0, END)
+                website_entry_tab1.delete(0, END)
                 password_entry.delete(0, END)
                 email_entry.delete(0, END)
 
@@ -94,8 +95,8 @@ def save():
 
 # ---------------------------- FIND PASSWORD ------------------------------- #
 def find_password():
-    website = website_entry.get()
-    website_hashed = hash_maker(website_entry.get().lower())
+    website = website_entry_tab2.get()
+    website_hashed = hash_maker(website_entry_tab2.get().lower())
     try:
         with open("data.json") as data_file:
             data = json.load(data_file)
@@ -120,48 +121,65 @@ def find_password():
 
 # ---------------------------- UI SETUP ------------------------------- #
 
-window = CTk()
+window = customtkinter.CTk()
 window.title("Password Manager")
 window.config(padx=50, pady=50)
-window.geometry("600x600")
-window.maxsize(600,600)
-set_appearance_mode("system")
+window.geometry("750x600")
+window.maxsize(750,650)
+customtkinter.set_appearance_mode("system")
+my_tab = customtkinter.CTkTabview(window,width=700,height=500,corner_radius=20)
+my_tab.pack(pady=10)
+
+tab1 = my_tab.add("Add")
+tab2 = my_tab.add("Search")
 
 
-my_image = CTkImage(light_image=Image.open("Password_Manager/logo.png"),dark_image=Image.open("Password_Manager/logo.png"),size=(280, 280))
-img = CTkLabel(master=window, image= my_image, text="")
-img.grid(row= 0, column=1 )
+my_image = customtkinter.CTkImage(light_image=Image.open("Password_Manager/logo.png"),dark_image=Image.open("Password_Manager/logo.png"),size=(280, 280))
+img_tab1 = customtkinter.CTkLabel(master=tab1, image= my_image, text="")
+img_tab1.pack()
+
+#tab 2
+img_tab2 = customtkinter.CTkLabel(master=tab2, image= my_image, text="")
+img_tab2.pack()
+
 
 #Labels
-website_label = CTkLabel(master=window,text="Website:")
-website_label.grid(row=1, column=0)
+website_label_tab1 = customtkinter.CTkLabel(master=tab1,text="Website:")
+website_label_tab1.place(relx=0.2,rely=0.65, anchor=CENTER)
 
-email_label = CTkLabel(master=window,text="Email/Username:")
-email_label.grid(row=2, column=0)
+website_label_tab2 = customtkinter.CTkLabel(master=tab2,text="Website:")
+website_label_tab2.place(relx=0.2,rely=0.65, anchor=CENTER)
 
-password_label = CTkLabel(master=window,text="Password:")
-password_label.grid(row=3, column=0)
+email_label = customtkinter.CTkLabel(master=tab1,text="Email/Username:")
+email_label.place(relx=0.2,rely=0.75, anchor=CENTER)
+
+password_label = customtkinter.CTkLabel(master=tab1,text="Password:")
+password_label.place(relx=0.2,rely=0.85, anchor=CENTER)
 
 #Entries
-website_entry = CTkEntry(master=window,width=250,corner_radius=20)
-website_entry.grid(row=1, column=1)
-website_entry.focus()
+website_entry_tab1 = customtkinter.CTkEntry(master=tab1,width=250,corner_radius=20)
+website_entry_tab1.place(relx=0.5,rely=0.65,anchor=CENTER)
+website_entry_tab1.focus()
+
+website_entry_tab2 = customtkinter.CTkEntry(master=tab2,width=300,corner_radius=20)
+website_entry_tab2.place(relx=0.5,rely=0.65,anchor=CENTER)
+website_entry_tab2.focus()
 
 
-email_entry = CTkEntry(master=window,width=400, corner_radius=20)
-email_entry.grid(row=2, column=1, columnspan=2)
+email_entry = customtkinter.CTkEntry(master=tab1,width=390, corner_radius=20)
+email_entry.place(relx=0.61,rely=0.75, anchor = CENTER)
 
-password_entry = CTkEntry(master=window,width=250, corner_radius=20)
-password_entry.grid(row=3, column=1)
+password_entry = customtkinter.CTkEntry(master=tab1,width=250, corner_radius=20)
+password_entry.place(relx=0.5,rely=0.85, anchor=CENTER)
 
 # Buttons
-search_button = CTkButton(master=window,text="Search", width=13, command=find_password, corner_radius=20,border_width=1, fg_color="transparent",border_color="white")
-search_button.grid(row=1, column=2)
+search_button = customtkinter.CTkButton(master=tab2,text="Search", width=190, command=find_password, corner_radius=20,border_width=1, fg_color="transparent",border_color="white")
+search_button.place(relx=0.5,rely=0.75, anchor=CENTER)
 
-generate_password_button = CTkButton(master=window,text="Generate Password", command=generate_password,border_width=1,fg_color="transparent",corner_radius=20,border_color="white")
-generate_password_button.grid(row=3, column=2)
+generate_password_button = customtkinter.CTkButton(master=tab1,text="Generate Password", command=generate_password,border_width=1,fg_color="transparent",corner_radius=20,border_color="white")
+generate_password_button.place(relx=0.85,rely=0.85, anchor=CENTER)
 
-add_button = CTkButton(master=window,text="Add", width=300, command=save,corner_radius=20,fg_color="#4158D0",border_color="white")
-add_button.place(relx = 0.5, rely= 0.8, anchor = "center")
+add_button = customtkinter.CTkButton(master=tab1,text="Add", width=300, command=save,corner_radius=20,fg_color="#4158D0",border_color="white")
+add_button.place(relx=0.55,rely=0.95, anchor=CENTER)
 
 window.mainloop()
