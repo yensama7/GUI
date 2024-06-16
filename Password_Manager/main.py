@@ -173,10 +173,10 @@ password_entry = customtkinter.CTkEntry(master=tab1,width=250, corner_radius=20)
 password_entry.place(relx=0.5,rely=0.85, anchor=CENTER)
 
 # Buttons
-search_button = customtkinter.CTkButton(master=tab2,text="Search", width=190, command=find_password, corner_radius=20,border_width=1, fg_color="transparent",border_color="white")
+search_button = customtkinter.CTkButton(master=tab2,text="Search", width=190, command=find_password, corner_radius=20,border_width=1, fg_color="#4158D0",border_color="white")
 search_button.place(relx=0.5,rely=0.75, anchor=CENTER)
 
-generate_password_button = customtkinter.CTkButton(master=tab1,text="Generate Password", command=generate_password,border_width=1,fg_color="transparent",corner_radius=20,border_color="white")
+generate_password_button = customtkinter.CTkButton(master=tab1,text="Generate Password", command=generate_password,border_width=1,fg_color="#4158D0",corner_radius=20,border_color="white")
 generate_password_button.place(relx=0.85,rely=0.85, anchor=CENTER)
 
 add_button = customtkinter.CTkButton(master=tab1,text="Add", width=300, command=save,corner_radius=20,fg_color="#4158D0",border_color="white")
