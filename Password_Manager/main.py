@@ -83,8 +83,10 @@ def save():
 
             if result:
                 # Update the existing record
-                c.execute("UPDATE passwords SET username=?, password=? WHERE website=?", (encrypted_email, encrypted_password, website))
-                messagebox.showinfo(title="Updated", message="Password updated successfully")
+                yesno = messagebox.askyesno(title="Override?", message="would you like to override existing website data?")
+                if yesno:
+                    c.execute("UPDATE passwords SET username=?, password=? WHERE website=?", (encrypted_email, encrypted_password, website))
+                    messagebox.showinfo(title="Updated", message="Password updated successfully")
             else:
                 # Insert a new record
                 c.execute("INSERT INTO passwords VALUES (?, ?, ?)", (website, encrypted_email, encrypted_password))
